@@ -1,4 +1,4 @@
-# 재사용 워크플로: PR의 모든 커밋 메시지가 VelusxaX 커밋 규칙을 지키는지 검사한다.
+# 재사용 워크플로: PR 브랜치가 최신 main 위에 있는지, 모든 커밋 메시지가 VelusxaX 커밋 규칙을 지키는지 검사한다.
 # 각 저장소에서: jobs.check.uses: velusxax/.github/.github/workflows/check-commits.yml@main
 name: check-commits
 
@@ -13,6 +13,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: 최신 main 위로 rebase 했는지 검사
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if ! git merge-base --is-ancestor "$BASE" "$HEAD"; then
+            echo "::error::브랜치가 최신 main 위에 있지 않습니다. git fetch && git rebase origin/main 후 다시 push 하세요."; exit 1
+          fi
+          if [ -n "$(git rev-list --merges "$BASE..$HEAD")" ]; then
+            echo "::error::브랜치 안에 merge commit이 있습니다. main을 merge하지 말고 rebase 하세요."; exit 1
+          fi
+          echo "최신 main 위에 있고, 브랜치 안에 merge commit이 없습니다."
 
       - name: 커밋 메시지 검사
         env:
