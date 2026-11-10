@@ -5,14 +5,14 @@ VelusxaX의 모든 저장소에 적용되는 규칙입니다. 저장소별 세�
 ## 1. 작업 흐름
 
 ```
-이슈 생성 → 브랜치 생성 → 함수 단위 커밋 → PR → 리뷰·CI → Rebase and merge → 브랜치 자동 삭제
+이슈 생성 → 브랜치 생성 → 함수 단위 커밋 → PR → main 위로 rebase → 리뷰·CI → Merge commit으로 병합 → 브랜치 자동 삭제
 ```
 
 1. 모든 작업은 **이슈**에서 시작합니다. 템플릿(기능 요청, 버그)을 사용합니다.
 2. 이슈 번호로 브랜치를 만듭니다.
 3. 함수(또는 타입) 하나마다 커밋합니다.
 4. PR을 열고 `Closes #이슈번호`를 적습니다.
-5. CI가 통과하고 리뷰가 끝나면 **Rebase and merge**로 병합합니다.
+5. 최신 main 위로 rebase하고, CI가 통과하고 리뷰가 끝나면 **Create a merge commit**으로 병합합니다.
 
 ## 2. 브랜치
 
@@ -88,7 +88,13 @@ Refs: #이슈번호
 
 ### 병합
 
-- **Rebase and merge만** 사용합니다. Squash와 merge commit은 저장소 설정에서 꺼 두었습니다. 함수 단위 커밋과 설명이 main에 그대로 남아야 하기 때문입니다.
+- **병합 직전에 최신 main 위로 rebase**하고, **Create a merge commit**으로 병합합니다. Squash와 Rebase and merge는 저장소 설정에서 꺼 두었습니다.
+  - 함수 단위 커밋과 설명이 main에 그대로 남습니다 (squash는 커밋을 하나로 합쳐서 지움).
+  - PR마다 갈래가 생겨서 어떤 커밋이 어느 PR(이슈)에 속하는지 그래프에서 보입니다.
+  - 먼저 rebase하기 때문에 갈래가 서로 엉키지 않습니다.
+  - PR 전체를 되돌릴 때는 merge commit 하나만 되돌리면 됩니다: `git revert -m 1 <merge commit>`
+- merge commit 메시지는 PR 제목과 본문으로 자동 작성됩니다. 그래서 PR 제목도 커밋 형식을 지킵니다.
+- 브랜치에 main을 merge하지 않습니다. 최신 main이 필요하면 rebase합니다 (`git fetch && git rebase origin/main`). CI가 브랜치 안의 merge commit과 rebase 여부를 검사합니다.
 - 병합한 브랜치는 자동으로 삭제됩니다.
 
 ## 5. 이슈
