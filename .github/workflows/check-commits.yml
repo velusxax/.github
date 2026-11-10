@@ -1,0 +1,39 @@
+# 재사용 워크플로: PR의 모든 커밋 메시지가 VelusxaX 커밋 규칙을 지키는지 검사한다.
+# 각 저장소에서: jobs.check.uses: velusxax/.github/.github/workflows/check-commits.yml@main
+name: check-commits
+
+on:
+  workflow_call:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 커밋 메시지 검사
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          header_re='^(feat|fix|refactor|test|docs|build|ci|chore)(\([a-z0-9-]+\))?!?: .+'
+          fail=0
+          for sha in $(git rev-list "$BASE..$HEAD"); do
+            msg=$(git log -1 --format=%B "$sha")
+            header=$(printf '%s\n' "$msg" | head -n1)
+            short=$(git log -1 --format='%h' "$sha")
+            if ! printf '%s\n' "$header" | grep -qE "$header_re"; then
+              echo "::error::$short 헤더 형식 오류: '$header' (예: feat(macos): 대상 요약)"; fail=1; continue
+            fi
+            type=$(printf '%s\n' "$header" | sed -E 's/^([a-z]+).*/\1/')
+            case "$type" in feat|fix|refactor)
+              for s in '[무엇]' '[역할]' '[연결]'; do
+                printf '%s\n' "$msg" | grep -qF "$s" || { echo "::error::$short '$type' 커밋에 $s 섹션이 없습니다"; fail=1; }
+              done ;;
+            esac
+          done
+          [ "$fail" = 0 ] && echo "모든 커밋이 규칙을 지킵니다."
+          exit $fail
