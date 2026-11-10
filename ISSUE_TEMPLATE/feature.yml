@@ -1,0 +1,38 @@
+name: 기능 요청
+description: 새 기능이나 개선을 제안합니다
+title: "[기능] "
+labels: ["type: feature"]
+body:
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 플랫폼
+      multiple: true
+      options: [macos, windows, ios, android, web, backend, core, contracts, 기타]
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: 해결하려는 문제
+      description: 무엇이 불편하거나 필요한지
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 제안
+      description: 어떻게 동작하면 좋을지
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 조건
+      description: 무엇이 되면 이 이슈를 닫을 수 있는지
+      placeholder: "- [ ] ..."
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 우선순위
+      options: [high, medium, low]

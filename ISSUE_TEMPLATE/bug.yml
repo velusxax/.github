@@ -1,0 +1,46 @@
+name: 버그
+description: 잘못 동작하는 것을 신고합니다
+title: "[버그] "
+labels: ["type: bug"]
+body:
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 플랫폼
+      multiple: true
+      options: [macos, windows, ios, android, web, backend, core, contracts, 기타]
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 버전 / 커밋
+      placeholder: "macos/v0.1.0 또는 커밋 SHA"
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 방법
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대한 동작
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 동작
+      description: 에러 메시지, 로그, 스크린샷 (API 키 등 비밀 정보는 지우고 올려주세요)
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 우선순위
+      options: [high, medium, low]
